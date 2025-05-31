@@ -11,16 +11,18 @@ import java.lang.reflect.Proxy;
 
 @AllArgsConstructor
 public class ServiceProxy implements InvocationHandler {
-    private String host;
-    private int port;
+    private RPCClient rpcClient;
+
+    public ServiceProxy(RPCClient rpcClient) {
+        this.rpcClient = rpcClient;
+    }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Request request = Request.builder().interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName()).params(args).paramTypes(method.getParameterTypes())
                 .build();
-
-        Response response = (Response) IOClient.sendRequest(host, port, request);
+        Response response = (Response) rpcClient.sendRequest(request);
         return response.getData();
     }
 
