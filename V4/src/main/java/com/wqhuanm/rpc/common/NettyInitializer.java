@@ -1,5 +1,8 @@
 package com.wqhuanm.rpc.common;
 
+import com.wqhuanm.rpc.codec.DeCode;
+import com.wqhuanm.rpc.codec.EnCode;
+import com.wqhuanm.rpc.codec.JsonSerializer;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -29,13 +32,8 @@ public class NettyInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
         //出站时计算消息体长度并写入前4个字节
         pipeline.addLast(new LengthFieldPrepender(4));
-        pipeline.addLast(new ObjectDecoder(new ClassResolver() {
-            @Override
-            public Class<?> resolve(String s) throws ClassNotFoundException {
-                return Class.forName(s);
-            }
-        }));
-        pipeline.addLast(new ObjectEncoder());
+        pipeline.addLast(new DeCode());
+        pipeline.addLast(new EnCode(new JsonSerializer()));
 
         var constructor = inboundHandler.getDeclaredConstructor();
         constructor.setAccessible(true);
