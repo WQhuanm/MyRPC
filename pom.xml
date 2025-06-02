@@ -14,6 +14,7 @@
         <module>V2</module>
         <module>V3</module>
         <module>V4</module>
+        <module>v5</module>
     </modules>
 
     <dependencies>
@@ -30,11 +31,17 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.95.Final</version>
         </dependency>
-<!--        fastjson-->
+        <!--        fastjson-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.83</version>
+        </dependency>
+        <!--zookeeper-->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>5.1.0</version>
         </dependency>
     </dependencies>
 
