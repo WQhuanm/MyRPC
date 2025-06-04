@@ -3,38 +3,37 @@ package com.wqhuanm.rpc.client;
 import com.wqhuanm.rpc.common.NettyInitializer;
 import com.wqhuanm.rpc.common.Request;
 import com.wqhuanm.rpc.common.Response;
+import com.wqhuanm.rpc.register.ServiceRegister;
+import com.wqhuanm.rpc.register.ZKServiceRegister;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import lombok.NoArgsConstructor;
 
-import java.util.concurrent.CompletableFuture;
+import java.net.InetSocketAddress;
+
 
 public class NettyRPCClient implements RPCClient {
+    private Bootstrap bootstrap = new Bootstrap();//辅助启动类
+    private ServiceRegister zkRegister = new ZKServiceRegister();
 
-    private static final Bootstrap bootstrap = new Bootstrap();//辅助启动类
-    private static final EventLoopGroup group = new NioEventLoopGroup();//事件循环处理组
-    private String host;
-    private int port;
-    private CompletableFuture<Response> future;
-
-
-    public NettyRPCClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    static {
-        bootstrap.group(group).channel(NioSocketChannel.class)
-                .handler(new NettyInitializer(NettyHandler.class));
+    public NettyRPCClient() {
+        bootstrap.group(new NioEventLoopGroup()).channel(NioSocketChannel.class)
+                .handler(new NettyInitializer(new NettyHandler()));
     }
 
     @Override
     public Response sendRequest(Request request) {
         try {
-            Channel channel = bootstrap.connect(host, port).sync().channel();
+            InetSocketAddress discover = zkRegister.discover(request.getInterfaceName());
+            System.out.println(discover);
+            Channel channel = bootstrap.connect(discover.getHostName(), discover.getPort())
+                    .sync().channel();
+            System.out.println("与服务器建立连接，发送请求ing");
             channel.writeAndFlush(request);
             channel.closeFuture().sync();
 
@@ -43,12 +42,13 @@ public class NettyRPCClient implements RPCClient {
             System.out.println("获取到response: " + response);
             return response;
         } catch (InterruptedException e) {
+            System.out.println("啊，我死了");
             throw new RuntimeException(e);
         }
     }
 
     @NoArgsConstructor
-    static class NettyHandler extends SimpleChannelInboundHandler<Response> {
+    class NettyHandler extends SimpleChannelInboundHandler<Response> {
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
             AttributeKey<Response> key = AttributeKey.valueOf("response");

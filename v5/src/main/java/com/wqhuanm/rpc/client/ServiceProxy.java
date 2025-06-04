@@ -2,7 +2,6 @@ package com.wqhuanm.rpc.client;
 
 import com.wqhuanm.rpc.common.Request;
 import com.wqhuanm.rpc.common.Response;
-import lombok.AllArgsConstructor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,7 +20,7 @@ public class ServiceProxy implements InvocationHandler {
         Request request = Request.builder().interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName()).params(args).paramTypes(method.getParameterTypes())
                 .build();
-        Response response = (Response) rpcClient.sendRequest(request);
+        Response response = rpcClient.sendRequest(request);
         return response.getData();
     }
 

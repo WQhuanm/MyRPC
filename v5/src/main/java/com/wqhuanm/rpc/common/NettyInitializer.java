@@ -3,23 +3,21 @@ package com.wqhuanm.rpc.common;
 import com.wqhuanm.rpc.codec.DeCode;
 import com.wqhuanm.rpc.codec.EnCode;
 import com.wqhuanm.rpc.codec.JsonSerializer;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.serialization.ClassResolver;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
-
-import java.lang.reflect.Constructor;
 
 
 /**
  * 对入站和出站的消息分别进行解码和编码
  */
 public class NettyInitializer extends ChannelInitializer<SocketChannel> {
-    private Class<? extends ChannelInboundHandlerAdapter> inboundHandler;
-    public NettyInitializer(Class<? extends ChannelInboundHandlerAdapter> handler) {
+    private ChannelInboundHandlerAdapter inboundHandler;
+
+    public NettyInitializer(ChannelInboundHandlerAdapter handler) {
         this.inboundHandler = handler;
     }
 
@@ -34,9 +32,6 @@ public class NettyInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new LengthFieldPrepender(4));
         pipeline.addLast(new DeCode());
         pipeline.addLast(new EnCode(new JsonSerializer()));
-
-        var constructor = inboundHandler.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        pipeline.addLast(constructor.newInstance());
+        pipeline.addLast(inboundHandler);
     }
 }

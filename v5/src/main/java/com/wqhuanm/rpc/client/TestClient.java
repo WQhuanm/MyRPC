@@ -8,7 +8,7 @@ import com.wqhuanm.rpc.service.UserService;
 public class TestClient {
 
     public static void main(String[] args) {
-        NettyRPCClient client=new NettyRPCClient("localhost", 12345);
+        NettyRPCClient client = new NettyRPCClient();
         ServiceProxy proxy = new ServiceProxy(client);
         UserService userService = proxy.getProxy(UserService.class);
         User user = userService.getUserById(666);

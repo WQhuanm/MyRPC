@@ -15,7 +15,7 @@ public class ZKServiceRegister implements ServiceRegister {
 
     public ZKServiceRegister() {
         this.client = CuratorFrameworkFactory.builder().connectString("127.0.0.1:2181")
-                .sessionTimeoutMs(40000).retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .sessionTimeoutMs(4000).retryPolicy(new ExponentialBackoffRetry(1000, 3))
                 .namespace(ROOT_PATH).build();
         client.start();
         System.out.println("ZOOKEEPER连接成功");
