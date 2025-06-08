@@ -30,7 +30,8 @@ public class NettyRPCServer implements RPCServer {
 
         try {
             ChannelFuture channelFuture = serverBootstrap.group(bossGroup, workGroup).channel(NioServerSocketChannel.class)
-                    .childHandler(new NettyInitializer(new NettyHandler(serviceProvider))).bind(port).sync();
+                    .childHandler(new NettyInitializer(ServerNettyHandler.class, serviceProvider))
+                    .bind(port).sync();
             System.out.println("服务器启动成功，监听端口：" + port);
             //死循环监听
             channelFuture.channel().closeFuture().sync();
@@ -43,32 +44,5 @@ public class NettyRPCServer implements RPCServer {
 
     }
 
-    class NettyHandler extends SimpleChannelInboundHandler<Request> {
-        private ServiceProvider serviceProvider;
-
-        public NettyHandler(ServiceProvider serviceProvider) {
-            this.serviceProvider = serviceProvider;
-        }
-
-        @Override
-        protected void channelRead0(ChannelHandlerContext ctx, Request msg) throws Exception {
-            Response response = getResponse(msg);
-            ctx.writeAndFlush(response);
-            ctx.close();
-        }
-
-        private Response getResponse(Request request) {
-            Object service = serviceProvider.getService(request.getInterfaceName());
-            try {
-                System.out.println("正在查询请求");
-                Method method = service.getClass().getMethod(request.getMethodName(), request.getParamTypes());
-                Object invoke = method.invoke(service, request.getParams());
-                return Response.success(invoke);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-    }
 
 }
