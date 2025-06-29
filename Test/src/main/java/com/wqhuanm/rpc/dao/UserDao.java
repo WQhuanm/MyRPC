@@ -1,10 +1,12 @@
 package com.wqhuanm.rpc.dao;
 
+import com.wqhuanm.rpc.pojo.User;
+
 public class UserDao
 {
 
-    public int getUserId(int cardId){
-        return cardId;
+    public User getUser(int userId){
+        return null;
     }
 
 }

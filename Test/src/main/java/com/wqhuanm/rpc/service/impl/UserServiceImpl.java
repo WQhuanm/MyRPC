@@ -10,17 +10,15 @@ public class UserServiceImpl implements UserService
 {
     private UserDao userDao;
 
-    public UserServiceImpl(UserDao userDao)
+    public User getUserById(int userId)
     {
-        this.userDao = userDao;
-    }
-    public User getUserById()
-    {
-        int userId = userDao.getUserId(123);
-        User user = User.builder()
-                .userId(userId).userName(UUID.randomUUID().toString())
-                .address(UUID.randomUUID().toString()).sex(false).build();
+        if(!allow())return  null;
+        User user = userDao.getUser(userId);
         return user;
+    }
+
+    public boolean allow(){
+        return  false;
     }
 
 }

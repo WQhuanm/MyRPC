@@ -27,16 +27,14 @@
             <version>1.18.34</version>
             <optional>true</optional>
         </dependency>
+<!--       spock-->
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
             <version>2.3-groovy-4.0</version>
             <scope>test</scope>
         </dependency>
-
-
-
-        <!--        cglib-->
+<!--        Byte Buddy-->
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
